@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Математика Квалтест — Quizizz</title>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX CSS & JS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    /* Quizizz Gamified Custom Styles & Animations */
+    :root {
+      --bg-deep: #1a0b2e;
+      --card-purple: #2c144a;
+      --tile-blue: #2d70ae;
+      --tile-blue-dark: #1f5282;
+      --tile-teal: #2d9da6;
+      --tile-teal-dark: #1f747b;
+      --tile-amber: #efa929;
+      --tile-amber-dark: #c28312;
+      --tile-rose: #d5546d;
+      --tile-rose-dark: #a6374e;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.18) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(45, 112, 174, 0.08) 0%, transparent 60%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Vibrant Quizizz Answer Tiles with 3D press effect */
+    .quiz-tile {
+      transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), filter 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .quiz-tile:not(:disabled):hover {
+      transform: translateY(-3px);
+      filter: brightness(1.08);
+    }
+    .quiz-tile:not(:disabled):active {
+      transform: translateY(2px);
+    }
+
+    .tile-0 { background-color: var(--tile-blue); box-shadow: 0 6px 0 var(--tile-blue-dark); }
+    .tile-1 { background-color: var(--tile-teal); box-shadow: 0 6px 0 var(--tile-teal-dark); }
+    .tile-2 { background-color: var(--tile-amber); box-shadow: 0 6px 0 var(--tile-amber-dark); }
+    .tile-3 { background-color: var(--tile-rose); box-shadow: 0 6px 0 var(--tile-rose-dark); }
+
+    .tile-correct {
+      background-color: #16a34a !important;
+      box-shadow: 0 6px 0 #15803d, 0 0 25px rgba(34, 197, 94, 0.55) !important;
+      animation: popSuccess 0.35s ease;
+    }
+    .tile-wrong {
+      background-color: #dc2626 !important;
+      box-shadow: 0 6px 0 #991b1b, 0 0 25px rgba(239, 68, 68, 0.55) !important;
+      animation: shakeWrong 0.38s ease;
+    }
+    .tile-dimmed {
+      opacity: 0.32;
+      filter: grayscale(35%);
+    }
+
+    @keyframes popSuccess {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.035); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shakeWrong {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      40% { transform: translateX(7px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(0.9); }
+      100% { opacity: 0; transform: translateY(-42px) scale(1.15); }
+    }
+    .score-float {
+      animation: floatUp 0.9s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.85); }
+    }
+    .streak-glow {
+      animation: pulseGlow 1.5s infinite;
+    }
+
+    /* KaTeX readability inside dark cards & colored tiles */
+    .katex {
+      font-size: 1.12em;
+    }
+    .quiz-tile .katex {
+      color: #ffffff;
+    }
+    .katex-display {
+      margin: 0.4em 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #140824; }
+    ::-webkit-scrollbar-thumb { background: #4c287a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6b3ca8; }
+  </style>
+</head>
+<body class="antialiased selection:bg-fuchsia-500 selection:text-white">
+
+  <!-- ===================================================================== -->
+  <!-- MAIN APPLICATION CONTAINER                                            -->
+  <!-- ===================================================================== -->
+  <div id="app" class="min-h-screen flex flex-col">
+
+    <!-- ==================== 1. HOME SCREEN ==================== -->
+    <main id="screen-home" class="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 max-w-5xl mx-auto w-full">
+      <!-- Header Badge & Title -->
+      <div class="text-center mb-8 sm:mb-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/20 border border-fuchsia-400/40 text-fuchsia-200 text-xs sm:text-sm font-semibold mb-4 shadow-lg">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          2026 Квалтест базасы • 3 нұсқа • 137 есеп
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-fuchsia-200 to-amber-200 bg-clip-text text-transparent drop-shadow">
+          Математика Квалтест — Quizizz
+        </h1>
+        <p class="text-purple-200/80 mt-3 text-sm sm:text-base max-w-xl mx-auto">
+          Нұсқаны таңдап, ойын немесе жаттау режимінде дайындалыңыз. Барлық формулалар KaTeX арқылы анық көрсетіледі.
+        </p>
+      </div>
+
+      <!-- Mode & Settings Panel -->
+      <section class="w-full bg-[#2c144a]/90 backdrop-blur-md border border-purple-500/30 rounded-3xl p-4 sm:p-6 mb-7 shadow-2xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <!-- Mode Selector -->
+          <div class="flex bg-[#1a0b2e] p-1.5 rounded-2xl border border-purple-500/25">
+            <button id="btn-mode-game" onclick="setMode('game')"
+              class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-sm sm:text-base font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-lg">
+              <span>⚡</span> Ойын режимі (Quizizz)
+            </button>
+            <button id="btn-mode-study" onclick="setMode('study')"
+              class="flex-1 py-3 px-3 sm:px-4 rounded-xl text-sm sm:text-base font-bold transition-all flex items-center justify-center gap-2 text-purple-300 hover:text-white">
+              <span>🧠</span> Жаттау режимі
+            </button>
+          </div>
+
+          <!-- Toggles: Shuffle & Sound -->
+          <div class="flex flex-wrap items-center justify-center md:justify-end gap-3">
+            <button id="btn-toggle-shuffle" onclick="toggleShuffle()"
+              class="px-4 py-2.5 rounded-xl border border-purple-500/30 bg-[#1a0b2e] hover:bg-purple-900/50 text-sm font-semibold flex items-center gap-2 transition">
+              <span id="shuffle-dot" class="w-3 h-3 rounded-full bg-slate-500"></span>
+              <span>Сұрақтарды араластыру</span>
+            </button>
+
+            <button id="btn-toggle-sound-home" onclick="toggleSound()"
+              class="px-4 py-2.5 rounded-xl border border-emerald-400/40 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 text-sm font-semibold flex items-center gap-2 transition">
+              <span id="sound-icon-home">🔊</span>
+              <span id="sound-label-home">Дыбыс: Қосулы</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mode Hint -->
+        <p id="mode-description" class="mt-3 text-xs sm:text-sm text-purple-200/75 text-center md:text-left">
+          🔥 <strong>Ойын режимі:</strong> Әр сұраққа 60 секунд таймер, жылдамдық бонусы (+1000 базалық ұпай) және қатарынан дұрыс жауаптар сериясы (streak).
+        </p>
+      </section>
+
+      <!-- 3 Variant Cards -->
+      <section class="w-full grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Variant 10 -->
+        <div onclick="startQuiz(0)" role="button" tabindex="0"
+          class="group cursor-pointer bg-[#2c144a] hover:bg-[#37195c] border-2 border-blue-400/30 hover:border-blue-400 rounded-3xl p-6 transition-all duration-200 hover:-translate-y-1.5 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#2d70ae] text-white">10-НҰСҚА</span>
+              <span class="text-xs font-bold text-blue-200 bg-blue-500/20 px-2.5 py-1 rounded-lg">41 сұрақ</span>
+            </div>
+            <h2 class="text-xl font-extrabold text-white group-hover:text-blue-200 transition">
+              14.07 Шілде — Бассейн, Доп
+            </h2>
+            <p class="text-purple-200/75 text-sm mt-2">
+              Функция мәндер жиыны, логарифмдік теңсіздіктер, интеграл, стереометрия және 2 контекст.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-purple-500/25 flex items-center justify-between text-sm font-bold text-blue-300 group-hover:text-white">
+            <span>Тестті бастау</span>
+            <span class="text-lg transition-transform group-hover:translate-x-1">→</span>
+          </div>
+        </div>
+
+        <!-- Variant 11 -->
+        <div onclick="startQuiz(1)" role="button" tabindex="0"
+          class="group cursor-pointer bg-[#2c144a] hover:bg-[#37195c] border-2 border-teal-400/30 hover:border-teal-400 rounded-3xl p-6 transition-all duration-200 hover:-translate-y-1.5 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#2d9da6] text-white">11-НҰСҚА</span>
+              <span class="text-xs font-bold text-teal-200 bg-teal-500/20 px-2.5 py-1 rounded-lg">45 сұрақ</span>
+            </div>
+            <h2 class="text-xl font-extrabold text-white group-hover:text-teal-200 transition">
+              15.07 Аралас — Арық, Функция
+            </h2>
+            <p class="text-purple-200/75 text-sm mt-2">
+              Куб, комплекс сандар, комбинаторика, «Су жүретін арық» және $f(x)=\frac{3x-1}{x^2+1}$ контексттері.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-purple-500/25 flex items-center justify-between text-sm font-bold text-teal-300 group-hover:text-white">
+            <span>Тестті бастау</span>
+            <span class="text-lg transition-transform group-hover:translate-x-1">→</span>
+          </div>
+        </div>
+
+        <!-- Variant 12 -->
+        <div onclick="startQuiz(2)" role="button" tabindex="0"
+          class="group cursor-pointer bg-[#2c144a] hover:bg-[#37195c] border-2 border-rose-400/30 hover:border-rose-400 rounded-3xl p-6 transition-all duration-200 hover:-translate-y-1.5 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#d5546d] text-white">12-НҰСҚА</span>
+              <span class="text-xs font-bold text-rose-200 bg-rose-500/20 px-2.5 py-1 rounded-lg">51 сұрақ</span>
+            </div>
+            <h2 class="text-xl font-extrabold text-white group-hover:text-rose-200 transition">
+              16.07.26 — Айдын, Түймедақ
+            </h2>
+            <p class="text-purple-200/75 text-sm mt-2">
+              Анықталу облысы, туынды, кеңістіктегі түзулер, «Айдын» векторлары және «Түймедақ» контексті.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-purple-500/25 flex items-center justify-between text-sm font-bold text-rose-300 group-hover:text-white">
+            <span>Тестті бастау</span>
+            <span class="text-lg transition-transform group-hover:translate-x-1">→</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Keyboard Shortcuts Footer Hint -->
+      <footer class="mt-8 text-center text-xs text-purple-300/60">
+        Пернетақта: <kbd class="px-1.5 py-0.5 rounded bg-purple-900/70 border border-purple-500/30 text-purple-200">1–4</kbd> немесе <kbd class="px-1.5 py-0.5 rounded bg-purple-900/70 border border-purple-500/30 text-purple-200">A–D</kbd> — жауап таңдау • <kbd class="px-1.5 py-0.5 rounded bg-purple-900/70 border border-purple-500/30 text-purple-200">Enter</kbd> — келесі сұрақ
+      </footer>
+    </main>
+
+    <!-- ==================== 2. QUIZ SCREEN ==================== -->
+    <section id="screen-quiz" class="hidden flex-1 flex flex-col w-full max-w-5xl mx-auto px-3 sm:px-6 py-4">
+      <!-- Top HUD -->
+      <header class="bg-[#2c144a]/95 border border-purple-500/30 rounded-2xl p-3 sm:p-4 shadow-xl mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+          <!-- Left: Exit + Variant Title + Counter -->
+          <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="openExitModal()" title="Шығу"
+              class="p-2.5 rounded-xl bg-[#1a0b2e] hover:bg-rose-500/25 border border-purple-500/30 text-purple-200 hover:text-rose-200 transition">
+              ✕
+            </button>
+            <div>
+              <div id="hud-variant-name" class="text-xs font-semibold text-purple-300 truncate max-w-[140px] sm:max-w-[260px]">10-нұсқа</div>
+              <div class="text-sm sm:text-base font-extrabold text-white">
+                Сұрақ <span id="hud-counter" class="text-fuchsia-300">1 / 41</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center/Right: Streak, Score, Timer, Navigator, Sound -->
+          <div class="flex items-center gap-2 sm:gap-3 relative">
+            <!-- Streak Badge -->
+            <div id="hud-streak-box" class="hidden items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-amber-300 font-extrabold text-sm">
+              <span>🔥</span>
+              <span id="hud-streak">0</span>
+            </div>
+
+            <!-- Score Badge -->
+            <div id="hud-score-box" class="relative px-3 py-1.5 rounded-xl bg-[#1a0b2e] border border-fuchsia-500/40 text-sm font-extrabold text-fuchsia-200">
+              ⭐ <span id="hud-score">0</span>
+              <div id="score-popup-anchor" class="absolute -top-2 left-1/2 -translate-x-1/2"></div>
+            </div>
+
+            <!-- Timer Badge (Game Mode) -->
+            <div id="hud-timer-box" class="px-3 py-1.5 rounded-xl bg-[#1a0b2e] border border-cyan-400/40 text-cyan-300 font-extrabold text-sm min-w-[68px] text-center">
+              ⏱ <span id="hud-timer">60</span>с
+            </div>
+
+            <!-- Question Navigator Button -->
+            <button onclick="openNavModal()"
+              class="px-3 py-2 rounded-xl bg-purple-600/40 hover:bg-purple-600/70 border border-purple-400/40 text-xs sm:text-sm font-bold text-white transition flex items-center gap-1.5">
+              <span>☰</span> <span class="hidden sm:inline">Сұрақтар</span>
+            </button>
+
+            <!-- Sound Toggle -->
+            <button onclick="toggleSound()" id="btn-toggle-sound-quiz" title="Дыбыс"
+              class="p-2 rounded-xl bg-[#1a0b2e] hover:bg-purple-800/50 border border-purple-500/30 text-sm transition">
+              🔊
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mt-3 w-full h-2.5 bg-[#1a0b2e] rounded-full overflow-hidden">
+          <div id="hud-progress-bar" class="h-full bg-gradient-to-r from-fuchsia-500 via-purple-400 to-cyan-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </header>
+
+      <!-- Question Card -->
+      <div class="flex-1 flex flex-col justify-between gap-4">
+        <div class="bg-[#2c144a] border border-purple-500/35 rounded-3xl p-5 sm:p-8 shadow-2xl flex flex-col justify-center min-h-[180px] sm:min-h-[220px]">
+          <!-- Context Info Box (shown only if question has context) -->
+          <div id="question-context-box" class="hidden mb-4 p-3.5 sm:p-4 rounded-2xl bg-indigo-950/80 border border-cyan-400/40 text-cyan-100 text-xs sm:text-sm leading-relaxed">
+            <div class="font-extrabold text-cyan-300 uppercase tracking-wider text-[11px] mb-1">📌 Контекст</div>
+            <div id="question-context-text"></div>
+          </div>
+
+          <!-- Question Text -->
+          <div id="question-text" class="text-lg sm:text-2xl font-bold text-white text-center leading-relaxed break-words">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 4 Vibrant Answer Option Tiles -->
+        <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+          <!-- Buttons generated dynamically -->
+        </div>
+
+        <!-- Bottom Feedback & Navigation Bar -->
+        <div id="quiz-bottom-bar" class="bg-[#2c144a]/90 border border-purple-500/30 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+          <div id="feedback-message" class="text-sm sm:text-base font-bold text-purple-200 flex items-center gap-2">
+            <span>Жауап нұсқасын таңдаңыз (A–D немесе 1–4)</span>
+          </div>
+
+          <div class="flex items-center gap-2 ml-auto">
+            <button id="btn-prev" onclick="prevQuestion()"
+              class="hidden px-4 py-2.5 rounded-xl bg-[#1a0b2e] hover:bg-purple-900/60 border border-purple-500/30 text-sm font-bold text-purple-200 transition">
+              ← Алдыңғы
+            </button>
+            <button id="btn-next" onclick="nextQuestion()"
+              class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-extrabold text-sm sm:text-base shadow-lg transition transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+              Келесі →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. RESULTS SCREEN ==================== -->
+    <section id="screen-results" class="hidden flex-1 max-w-4xl mx-auto w-full px-4 py-8">
+      <!-- Summary Hero Card -->
+      <div class="bg-[#2c144a] border border-purple-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl text-center mb-6">
+        <div id="res-emoji" class="text-5xl sm:text-6xl mb-3">🏆</div>
+        <h2 id="res-title" class="text-2xl sm:text-4xl font-black text-white">Тест аяқталды!</h2>
+        <p id="res-subtitle" class="text-purple-200/80 text-sm sm:text-base mt-1"></p>
+
+        <!-- Accuracy Bar -->
+        <div class="mt-6 max-w-lg mx-auto">
+          <div class="flex justify-between text-xs sm:text-sm font-bold mb-1.5">
+            <span class="text-emerald-300">Дәлдік (пайыз)</span>
+            <span id="res-percent-label" class="text-white">0%</span>
+          </div>
+          <div class="w-full h-4 bg-[#1a0b2e] rounded-full overflow-hidden border border-purple-500/30">
+            <div id="res-accuracy-bar" class="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 rounded-full transition-all duration-700" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+          <div class="bg-[#1a0b2e] border border-purple-500/25 rounded-2xl p-4">
+            <div class="text-xs text-purple-300 font-semibold">Дұрыс жауап</div>
+            <div id="res-correct-count" class="text-2xl font-black text-emerald-400 mt-1">0 / 0</div>
+          </div>
+          <div class="bg-[#1a0b2e] border border-purple-500/25 rounded-2xl p-4">
+            <div class="text-xs text-purple-300 font-semibold">Жалпы ұпай</div>
+            <div id="res-score" class="text-2xl font-black text-fuchsia-300 mt-1">0</div>
+          </div>
+          <div class="bg-[#1a0b2e] border border-purple-500/25 rounded-2xl p-4">
+            <div class="text-xs text-purple-300 font-semibold">Ең үздік серия</div>
+            <div id="res-best-streak" class="text-2xl font-black text-amber-300 mt-1">🔥 0</div>
+          </div>
+          <div class="bg-[#1a0b2e] border border-purple-500/25 rounded-2xl p-4">
+            <div class="text-xs text-purple-300 font-semibold">Жалпы уақыт</div>
+            <div id="res-time" class="text-2xl font-black text-cyan-300 mt-1">00:00</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-3 mt-7">
+          <button id="btn-retry-wrong" onclick="startWrongOnlyQuiz()"
+            class="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-extrabold shadow-lg transition transform hover:-translate-y-0.5">
+            🎯 Қатемен жұмыс (<span id="wrong-count-badge">0</span>)
+          </button>
+          <button onclick="restartCurrentVariant()"
+            class="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold shadow-lg transition transform hover:-translate-y-0.5">
+            🔄 Қайта өту
+          </button>
+          <button onclick="goHome()"
+            class="px-6 py-3 rounded-2xl bg-[#1a0b2e] hover:bg-purple-900/70 border border-purple-400/40 text-purple-100 font-extrabold transition">
+            🏠 Нұсқа таңдау
+          </button>
+        </div>
+      </div>
+
+      <!-- Review Section -->
+      <div class="bg-[#2c144a] border border-purple-500/35 rounded-3xl p-5 sm:p-6 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 class="text-lg sm:text-xl font-extrabold text-white">📋 Сұрақтарды талдау</h3>
+          <div class="flex bg-[#1a0b2e] p-1 rounded-xl border border-purple-500/25 text-xs sm:text-sm font-bold">
+            <button id="filter-all" onclick="renderReviewList('all')" class="px-3 py-1.5 rounded-lg bg-purple-600 text-white">Барлығы</button>
+            <button id="filter-wrong" onclick="renderReviewList('wrong')" class="px-3 py-1.5 rounded-lg text-purple-300 hover:text-white">Тек қателер</button>
+          </div>
+        </div>
+        <div id="review-list" class="space-y-3">
+          <!-- Accordion items rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==================== QUESTION NAVIGATOR MODAL ==================== -->
+  <div id="modal-nav" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#2c144a] border border-purple-400/40 rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-extrabold text-white">Сұрақтар навигаторы</h3>
+        <button onclick="closeNavModal()" class="p-2 rounded-xl bg-[#1a0b2e] hover:bg-purple-800 text-purple-200">✕</button>
+      </div>
+      <div class="flex flex-wrap gap-3 text-xs text-purple-200 mb-4">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Дұрыс</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-500"></span> Қате</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-fuchsia-500 ring-2 ring-white"></span> Ағымдағы</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#1a0b2e] border border-purple-500/50"></span> Белгіленбеген</span>
+      </div>
+      <div id="nav-grid" class="grid grid-cols-6 sm:grid-cols-8 gap-2 overflow-y-auto pr-1 pb-2">
+        <!-- Generated dynamically -->
+      </div>
+      <div class="mt-4 pt-3 border-t border-purple-500/25 flex justify-between items-center">
+        <button onclick="finishQuizEarly()" class="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-bold">
+          Тестті аяқтау
+        </button>
+        <button onclick="closeNavModal()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-bold">
+          Жабу
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EXIT CONFIRMATION MODAL ==================== -->
+  <div id="modal-exit" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#2c144a] border border-purple-400/40 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center">
+      <div class="text-4xl mb-2">🚪</div>
+      <h3 class="text-xl font-extrabold text-white">Басты бетке шығу</h3>
+      <p class="text-sm text-purple-200/80 mt-2">Ағымдағы тест нәтижесі сақталмайды. Шынымен шыққыңыз келе ме?</p>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeExitModal()" class="flex-1 py-2.5 rounded-xl bg-[#1a0b2e] hover:bg-purple-900/60 border border-purple-500/30 font-bold text-purple-200">
+          Жалғастыру
+        </button>
+        <button onclick="confirmExit()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 font-bold text-white">
+          Иә, шығу
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT: QUIZ DATA, WEB AUDIO SYNTH, QUIZ ENGINE & KATEX RENDERING -->
+  <!-- ===================================================================== -->
+  <script>
+    /* =======================================================================
+       1. EXACT QUIZ DATA (ALL 3 VARIANTS — 137 QUESTIONS TOTAL)
+       ======================================================================= */
+    const VARIANTS = [
+      {
+        id: 10,
+        title: "10-нұсқа (14.07 Шілде — Бассейн, Доп)",
+        shortTitle: "10-нұсқа (14.07)",
+        questions: [
+          { q: "$y=\\sqrt{x^2-6x+9}\\cdot(x+3)$ функциясының мәндер жиынын $E(y)$ табыңыз", o: ["$[0;+\\infty)$", "$[-9;+\\infty)$", "$(-\\infty;+\\infty)$", "$(-\\infty;9]$"], a: 2 },
+          { q: "$\\log_7 x - 5 \\le 2\\log_{\\sqrt{x}}(\\frac{1}{7})$ теңсіздікті шешіңіз", o: ["$x\\in(0;2401]$", "$x\\in(0;1)\\cup[7;343]$", "$x\\in(1;7]\\cup[2401;+\\infty)$", "$x\\in(0;1)\\cup[7;2401]$"], a: 3 },
+          { q: "Цилиндрдің бүйір бетінің ауданы $C$, табанының ұзындығы $S$. Көлемін өрнекте.", o: ["$\\frac{SC^2}{4\\pi}$", "$\\frac{S^2C}{2\\pi}$", "$\\frac{SC}{2\\pi}$", "$\\frac{SC}{4\\pi}$"], a: 3 },
+          { q: "$\\begin{cases}2\\sqrt{x}-\\sqrt{y}+\\sqrt{xy}=8 \\\\ \\sqrt{xy}=3\\end{cases}$, $x-y=?$", o: ["8", "5", "9", "6"], a: 0 },
+          { q: "$ABC$ тік бұрышты ($\\angle C=90^\\circ$), $AC=10$, $D$ төбесі 6 қашықтық, $\\angle ABC=60^\\circ$ болса, $h$-ты табыңыз:", o: ["$\\sqrt{10}$", "$\\frac{\\sqrt{6}}{2}$", "$2\\sqrt{6}$", "$\\frac{2\\sqrt{6}}{3}$"], a: 3 },
+          { q: "Трапецияның биіктігі $h=10$, ауданы $S=110$, ал табандары $8x$ және $6x$ қатынасында. Кіші табанды табыңыз:", o: ["6", "8", "12", "10"], a: 3 },
+          { q: "Үшбұрышта табаны $25$, қабырғалары $3x$ және $2x$ қатынасында бөлінген ($15$ және $10$). Ізделінді кесіндіні табыңыз:", o: ["10", "15", "20", "25"], a: 1 },
+          { q: "$\\lim_{x\\to\\frac{\\pi}{4}}\\frac{\\sin(x-\\frac{\\pi}{4})}{4x-\\pi}$", o: ["0", "1", "0,25", "0,5"], a: 2 },
+          { q: "$\\int_{-1}^{1}2026\\cdot e^{2026x+2026}dx$", o: ["$e^{4052}$", "$e^{4052}-1$", "$e^{2026}-1$", "$2026e^{2026}$"], a: 1 },
+          { q: "Шар радиусы 5-ке тең. Іштей сызылған конустың радиусы 4. Конус көлемін табыңыз.", o: ["$32\\pi$", "$\\frac{256\\pi}{3}$", "$\\frac{128\\pi}{3}$", "$\\frac{64\\pi}{3}$"], a: 2 },
+          { q: "$(3+4i)z=-5+10i$ теңдеуін шешіңіз:", o: ["$1-2i$", "$-1+2i$", "$1+2i$", "$2+i$"], a: 2 },
+          { q: "Шектеусіз кемімелі геометриялық прогрессияның қосындысы $S=5$, бірінші мүшесі $b_1=2$. Оның еселігі $q$-ды табыңыз:", o: ["$2/5$", "$3/2$", "$1/2$", "$3/5$"], a: 3 },
+          { q: "$ABCA_1B_1C_1$ дұрыс призма. Барлық қырлары 1-ге тең. $AA_1$ қырынан $BCC_1$ жазықтығына дейінгі арақашықтықты табыңыз.", o: ["$\\frac{\\sqrt{3}}{2}$", "$\\frac{1}{2}$", "$1$", "$\\sqrt{3}$"], a: 0 },
+          { q: "$x^2-6x+y^2-2y+z^2=26$ теңдеуімен берілген сфераның диаметрін табыңыз:", o: ["12", "10", "26", "6"], a: 0 },
+          { q: "$\\sqrt{28-10\\sqrt{3}}+\\sqrt{28+10\\sqrt{3}}$", o: ["10", "12", "$2\\sqrt{28}$", "$10\\sqrt{3}$"], a: 0 },
+          { q: "$y=45\\sin(2026x)\\cos(2026x)+\\sqrt{2026}$ функциясының мәндер жиынын табыңыз:", o: ["$[-\\sqrt{8104};\\sqrt{8104}]$", "$[0;\\sqrt{8104}]$", "$[\\sqrt{2026};\\sqrt{8104}]$", "$[-\\sqrt{2026};\\sqrt{2026}]$"], a: 1 },
+          { q: "Сыныпта 12 ұл, 12 қыз. Ұлдар қыздардың сол жағына отыру тәсілі:", o: ["$12!$", "$(12!)^2$", "$2\\cdot 12!$", "$24!$"], a: 1 },
+          { q: "$A(2;4;1)$ нүктесінен $2x+3y+z+9=0$ жазықтығына дейінгі қашықтықты табыңыз:", o: ["$\\sqrt{14}$", "$\\frac{2\\sqrt{14}}{7}$", "$\\frac{\\sqrt{14}}{7}$", "$\\frac{\\sqrt{14}}{2}$"], a: 0 },
+          { q: "$2^{\\sqrt{x+1}}-3 < 2^{2-\\sqrt{x+1}}$", o: ["$[-1;3]$", "$[0;3]$", "$(-1;3]$", "$[-1;3)$"], a: 3 },
+          { q: "$a>0, b>0, a^2>b$ болса, өрнекті ықшамдаңыз: $\\sqrt{\\frac{a+\\sqrt{a^2-b}}{2}}+\\sqrt{\\frac{a-\\sqrt{a^2-b}}{2}}$", o: ["$\\sqrt{b}$", "$\\sqrt{a+\\sqrt{b}}$", "$a+\\sqrt{b}$", "$\\sqrt{2a}$"], a: 1 },
+          { q: "Интегралды табыңыз: $\\int 3x^2\\sqrt{x}\\,dx$", o: ["$\\frac{21}{2}x^3\\sqrt{x}+C$", "$\\frac{6}{5}x^2\\sqrt{x}+C$", "$\\frac{6}{7}x^3\\sqrt{x}+C$", "$\\frac{3}{7}x^3\\sqrt{x}+C$"], a: 2 },
+          { q: "Теңдеудің түбірлерін табыңыз: $\\int_2^x (3-2t)\\,dt = -2x+4$", o: ["1; 2", "3; 2", "1; 3", "3; 4"], a: 1 },
+          { q: "2 мергеннің нысанаға тигізу ықтималдылығы 0,6 және 0,3. Бір рет оқ атқанда тию ықтималдылығы:", o: ["0,72", "0,27", "0,28", "0,73"], a: 0 },
+          { q: "Қиық конусқа радиусы $r$ шар іштей сызылған. Жасаушысы табан жазықтығына $\\beta$ бұрыш жасайды. Бүйір бетінің ауданы?", o: ["$4\\pi r^2$", "$\\frac{4\\pi r^2}{\\sin^2\\beta}$", "$\\frac{2\\pi r^2}{\\sin\\beta}$", "$\\frac{4\\pi r^2}{\\cos^2\\beta}$"], a: 1 },
+          { q: "$z^{\\frac{1}{2}}+12z^{\\frac{1}{4}}+27$ өрнегінің көбейткіштерге жіктелуі:", o: ["$(z^{\\frac{1}{4}}-9)(z^{\\frac{1}{4}}-3)$", "$(z^{\\frac{1}{4}}+27)(z^{\\frac{1}{4}}+1)$", "$(z^{\\frac{1}{2}}+9)(z^{\\frac{1}{2}}+3)$", "$(z^{\\frac{1}{4}}+9)(z^{\\frac{1}{4}}+3)$"], a: 3 },
+          { q: "$\\cos x + \\sqrt{2}\\cos 2x - \\sin x \\ge 0$ теңсіздігін шешіңіз:", o: ["$[-\\frac{5\\pi}{12}+2\\pi n; \\frac{\\pi}{4}+2\\pi n]\\cup[\\frac{11\\pi}{12}+2\\pi n; \\frac{5\\pi}{4}+2\\pi n]$", "$[-\\frac{5\\pi}{12}+\\pi n; \\frac{\\pi}{4}+\\pi n]$", "$[-\\frac{\\pi}{4}+2\\pi n; \\frac{\\pi}{4}+2\\pi n]$", "$[\\frac{\\pi}{12}+2\\pi n; \\frac{7\\pi}{12}+2\\pi n]$"], a: 0 },
+          { q: "Ромбтың диагоналі қабырғасымен $20^\\circ$ бұрыш жасайды. Ромб қабырғасы 10-ға тең. Ромбтың диагональдарын табыңыз:", o: ["$d_1=10, d_2=10\\sqrt{3}$", "$d_1=20\\sin 70^\\circ, d_2=20\\cos 70^\\circ$", "$d_1=10\\cos 20^\\circ, d_2=10\\sin 20^\\circ$", "$d_1=20\\cos 20^\\circ, d_2=20\\sin 20^\\circ$"], a: 1 },
+          { q: "$339(x^2-1)^2+1687(x^2-1)-2026=0$ теңдеуінің түбірлерінің көбейтіндісін табыңыз:", o: ["-2", "-1", "1", "2"], a: 0 },
+          { q: "$\\log_{x-2}\\frac{x-1}{x+3}>1$ теңсіздігін шешіңіз:", o: ["$(\\sqrt{5};3)$", "$(2;\\sqrt{5})$", "$(3;+\\infty)$", "$(2;3)$"], a: 0 },
+          { q: "$f(x)=\\frac{2026}{\\sin^6 x+\\cos^6 x}$ функциясының мәндер жиынын табыңыз:", o: ["$[2026;4052]$", "$[1013;2026]$", "$[0;2026]$", "$[2026;8104]$"], a: 3 },
+          { q: "$y=\\frac{x^3-4x}{3x^2+4}$ болса, $y'(1)$-ді табыңыз:", o: ["$11/49$", "$5/49$", "$11/4$", "$3/49$"], a: 0 },
+          { ctx: "Бассейн (ұзындығы 1,2 м, ені 0,5 м, биіктігі 2 м)", q: "$1\\text{ м}^2$ бетті бояуға 200 г бояу кетсе, бассейнді (ішкі беттерін) бояуға қанша кг бояу қажет?", o: ["1,48 кг", "1,8 кг", "0,74 кг", "2,4 кг"], a: 0 },
+          { ctx: "Бассейн (ұзындығы 1,2 м, ені 0,5 м, биіктігі 2 м)", q: "Бассейнді бояу үшін 400 г бояудан нешеу алу керек?", o: ["3", "5", "2", "4"], a: 3 },
+          { ctx: "Бассейн (ұзындығы 1,2 м, ені 0,5 м, биіктігі 2 м)", q: "Бассейн бетінің ауданы:", o: ["$10,8\\text{ м}^2$", "$7,4\\text{ м}^2$", "$4,8\\text{ м}^2$", "$5,6\\text{ м}^2$"], a: 1 },
+          { ctx: "Бассейн (ұзындығы 1,2 м, ені 0,5 м, биіктігі 2 м)", q: "Бассейн суын 1 айда 4 рет ауыстырады, 3 айда неше хлор кетеді?", o: ["2 кг 160 гр", "1 кг 160 гр", "1 кг 800 гр", "2 кг 800 гр"], a: 0 },
+          { ctx: "Бассейн (ұзындығы 1,2 м, ені 0,5 м, биіктігі 2 м)", q: "Бассейн көлемі:", o: ["$V=2,4\\text{ м}^3$", "$V=1,2\\text{ м}^3$", "$V=1,8\\text{ м}^3$", "$V=2,8\\text{ м}^3$"], a: 2 },
+          { ctx: "Футбол добының қорабы: куб тәріздес қораптың диагоналі $25\\sqrt{3}$ см, доп барлық жақтарын жанайды.", q: "Доптың радиусын табыңыз:", o: ["20 см", "15 см", "12,5 см", "10 см"], a: 2 },
+          { ctx: "Футбол добының қорабы: куб диагоналі $25\\sqrt{3}$ см.", q: "Қорап қырының ұзындығын табыңыз:", o: ["20 см", "30 см", "15 см", "25 см"], a: 3 },
+          { ctx: "Футбол добының қорабы: куб диагоналі $25\\sqrt{3}$ см.", q: "Қорап бетінің ауданы?", o: ["$3565\\text{ см}^2$", "$3860\\text{ см}^2$", "$3750\\text{ см}^2$", "$3625\\text{ см}^2$"], a: 2 },
+          { ctx: "Футбол добының қорабы: куб диагоналі $25\\sqrt{3}$ см.", q: "Доп бетінің ауданы?", o: ["$860\\pi$", "$625\\pi$", "$362\\pi$", "$565\\pi$"], a: 1 },
+          { ctx: "Футбол добының қорабы: куб диагоналі $25\\sqrt{3}$ см ($\\pi=3$).", q: "Қораптың бос бөлігінің көлемін табыңыз:", o: ["$6812,5\\text{ см}^3$", "$8562,5\\text{ см}^3$", "$8688,26\\text{ см}^3$", "$7812,5\\text{ см}^3$"], a: 3 }
+        ]
+      },
+      {
+        id: 11,
+        title: "11-нұсқа (15.07 Аралас — Арық, Функция)",
+        shortTitle: "11-нұсқа (15.07)",
+        questions: [
+          { q: "$x^2-6x+7=0$ теңдеуінің түбірлері $x_1, x_2$ болса, $x_1^2+x_2^2$ мәні:", o: ["36", "22", "14", "29"], a: 1 },
+          { q: "$AA_1BB_1CC_1DD_1$ бірлік кубында $ABC$ жазықтығы мен $AB_1D_1$ жазықтықтарының арасындағы бұрышты өрнектейтін шама:", o: ["$\\operatorname{arctg}\\sqrt{2}$", "$\\arcsin\\sqrt{2}$", "$\\operatorname{arctg}\\frac{\\sqrt{2}}{2}$", "$\\arccos\\frac{1}{3}$"], a: 0 },
+          { q: "$(1-i)^6+(\\frac{1-i}{1+i})^4+(\\frac{4+i^{2027}}{3-i^{2025}})^2$ өрнегін есептеңіз:", o: ["$1.52-6.45i$", "$3.12+5.18i$", "$2.68+8.26i$", "$-2.68+8.26i$"], a: 2 },
+          { q: "$\\vec{a}\\{-6;3;5\\}$ және $\\vec{b}\\{4;y;3\\}$ векторлары ортогональ болса, $y$-мәнін табыңыз:", o: ["3", "-3", "2", "1"], a: 0 },
+          { q: "$ABCDA_1B_1C_1D_1$ бірлік кубта $BB_1$ мен $A_1C$ түзулері арасындағы бұрыш:", o: ["$\\arccos\\frac{\\sqrt{2}}{3}$", "$\\arcsin\\frac{1}{\\sqrt{3}}$", "$\\arccos\\frac{\\sqrt{2}}{\\sqrt{3}}$", "$\\arccos\\frac{1}{\\sqrt{3}}$"], a: 3 },
+          { q: "$(p-3)x^2+2x+p=0$ теңдеуінің жалғыз түбірі және екі түбірі бір-біріне тең болатындай $p$ параметрінің барлық мәндерінің қосындысын табыңыз:", o: ["3", "4", "6", "5"], a: 2 },
+          { q: "$\\left(\\frac{x}{x+8}-\\frac{4x}{(x^{1/3}+2)^3}\\right)\\cdot\\left(\\frac{1+2(x^{1/3})^{-1}}{1-2(x^{1/3})^{-1}}\\right)^2-\\frac{24}{x+8}+x$ өрнегін ықшамдаңыз:", o: ["$x+3$", "$x-2$", "$x+2$", "$x-3$"], a: 3 },
+          { q: "$\\frac{\\lim_{x\\to\\pi}\\frac{1-\\cos x}{\\sin^3 x}}{\\lim_{x\\to 0}\\frac{\\sqrt{2x+1}-1}{\\sqrt{3x+4}-2}}$ қатынасын табыңыз:", o: ["$\\infty$", "$-\\infty$", "$0$", "$1$"], a: 0 },
+          { q: "Дұрыс алтыбұрышты призманың барлық қырлары тең, ал толық бетінің ауданы $(48\\sqrt{3}+72)\\text{ см}^2$. Призма табанының ауданын табыңыз:", o: ["$24\\text{ см}^2$", "$72\\text{ см}^2$", "$48\\text{ см}^2$", "$36\\text{ см}^2$"], a: 3 },
+          { q: "Дұрыс үшбұрышты призманың бүйір жағы квадрат. Табанындағы үшбұрышқа сырттай сызылған шеңбер радиусы $R$-ге тең. Призманың толық бетінің ауданын тап?", o: ["$3R^2(\\frac{\\sqrt{3}}{4}+3)$", "$R^2(\\frac{\\sqrt{3}}{2}+1)$", "$6R^2(\\sqrt{3}+3)$", "$3R^2(\\frac{\\sqrt{3}}{2}+3)$"], a: 3 },
+          { q: "$y=-x^2\\sqrt{x^2+1}$ функциясының экстремумы болатын нүктелер:", o: ["$x_{\\max}=0$", "$x_{\\min}=0$", "$x_{\\max}=1$", "$x_{\\min}=-1$"], a: 0 },
+          { q: "12 оқушыны 3 топқа 4 баладан бөлудің қанша тәсілі бар?", o: ["34650", "5775", "4950", "11550"], a: 1 },
+          { q: "$y=x^2\\sqrt{2-x}$ функциясының кему аралығын тап?", o: ["$(-\\infty;0]\\cup[\\frac{8}{5};+\\infty)$", "$[0;\\frac{8}{5}]$", "$(-\\infty;0]\\cup[\\frac{8}{5};2]$", "$(-\\infty;\\frac{8}{5}]$"], a: 2 },
+          { q: "10 қыз және 8 ұлдан 6 оқушы таңдау керек, қыздар саны 3-тен аспау керек жолы:", o: ["$C_{10}^1C_8^5+C_{10}^2C_8^4+C_{10}^3C_8^3$", "$C_{10}^0C_8^6+C_{10}^1C_8^5+C_{10}^2C_8^4+C_{10}^3C_8^3$", "$C_{10}^0C_8^0+C_{10}^1C_8^1+C_{10}^2C_8^2+C_{10}^3C_8^3$", "$C_{10}^3C_8^3$"], a: 1 },
+          { q: "$y=\\frac{\\sqrt{\\cos x}}{1-\\sin x}$ функциясының анықталу облысы:", o: ["$[-\\frac{\\pi}{2}+2\\pi n;\\frac{\\pi}{2}+2\\pi n), n\\in\\mathbb{Z}$", "$[-\\frac{\\pi}{2}+2\\pi n;\\frac{\\pi}{2}+2\\pi n], n\\in\\mathbb{Z}$", "$(-\\frac{\\pi}{2}+2\\pi n;\\frac{\\pi}{2}+2\\pi n), n\\in\\mathbb{Z}$", "$[-\\frac{\\pi}{2}+\\pi n;\\frac{\\pi}{2}+\\pi n), n\\in\\mathbb{Z}$"], a: 0 },
+          { q: "Теңдеуді шешіңіз: $(\\sqrt{2-\\sqrt{3}})^x+\\frac{1}{(\\sqrt{2-\\sqrt{3}})^x}=4$", o: ["-2", "$\\pm 1$", "$\\pm 2$", "2"], a: 2 },
+          { q: "$y=x^2, x-1=0, x-2=0$ қисықтарымен шектелген фигураны $Ox$ осімен айналдырғанда шыққан дененің көлемін табыңыз:", o: ["$5,4\\pi$", "$5,8\\pi$", "$6,2\\pi$", "$6,6\\pi$"], a: 2 },
+          { q: "$ABCDA_1B_1C_1D_1$ тікбұрышты параллелепипедінде $AB=4, BC=5, AA_1=3$. $AB_1$ және $A_1C_1$ түзулерінің арасындағы бұрыштың косинусын табыңыз:", o: ["$\\frac{5\\sqrt{34}}{17}$", "$\\frac{10}{\\sqrt{41}}$", "$\\frac{32}{5\\sqrt{34}}$", "$\\frac{16}{5\\sqrt{41}}$"], a: 3 },
+          { q: "$y=2-x, y=x^2, y=0$ сызықтарымен шектелген трапецияны абсцисса осімен айналдырғанда пайда болған фигура көлемін тап:", o: ["$4\\pi/15$", "$\\pi/3$", "$8\\pi/15$", "$2\\pi/15$"], a: 2 },
+          { q: "Тікбұрышты үшбұрыштарда $4, 5, 12$ және $x, y$ кесінділері берілген. $\\sqrt{2(x+y)}$ табыңыз:", o: ["$\\sqrt{17}-3$", "$\\sqrt{17}+3$", "$3-\\sqrt{17}$", "$\\sqrt{14}$"], a: 1 },
+          { q: "$\\begin{cases}x^2-4x-5\\ge 0 \\\\ x^2-2x-8<0\\end{cases}$ теңсіздік жүйесін шешіңіз:", o: ["$(-2;-1]$", "$(-\\infty;-1]$", "$[-1;5]$", "$(-2;4)$"], a: 0 },
+          { q: "$a_1+a_{10}=20$ болса, арифметикалық прогрессияның алғашқы 10 мүшесінің қосындысын табыңыз:", o: ["100", "110", "130", "150"], a: 0 },
+          { q: "Тікбұрышты $ABC$ үшбұрышында ($\\angle C=90^\\circ$) $AC=7, CD=4,5, DB=4,5, AB=15$. $AD$ ұзындығын тап:", o: ["$\\sqrt{69,25}$", "$\\sqrt{69,13}$", "$\\sqrt{83,2}$", "$\\sqrt{64,25}$"], a: 0 },
+          { q: "$BC=14$ см, $AC=15$ см, $AB=12$ см. $BC$ қабырғасы мен $AB, AC$ созындыларын жанайтын сырттай жанама шеңбер радиусын табыңыз:", o: ["12,14 см", "14,2 см", "15,12 см", "11,5 см"], a: 0 },
+          { q: "$y=\\frac{1}{\\sqrt{-1+2\\sin 2x}}$ функциясының анықталу облысын табыңыз:", o: ["$x\\in(\\frac{\\pi}{6}+2\\pi k;\\frac{5\\pi}{6}+2\\pi k)$", "$x\\in[\\frac{\\pi}{12}+\\pi k;\\frac{5\\pi}{12}+\\pi k]$", "$x\\in(\\frac{\\pi}{12}+2\\pi k;\\frac{5\\pi}{12}+2\\pi k)$", "$x\\in(\\frac{\\pi}{12}+\\pi k;\\frac{5\\pi}{12}+\\pi k)$"], a: 3 },
+          { q: "$\\frac{1}{x^2}+5=\\frac{6}{x}$ теңдеуін шешіңіз:", o: ["$x_1=1, x_2=5$", "$x_1=-1, x_2=-5$", "$x_1=1, x_2=0,2$", "$x_1=1, x_2=-0,2$"], a: 2 },
+          { q: "Центрлік бұрышы $120^\\circ$, радиусы 6 см сектор конусты орайды. Конустың көлемін табыңыз:", o: ["$V=\\frac{16\\sqrt{2}\\pi}{3}\\text{ см}^3$", "$V=\\frac{8\\sqrt{2}\\pi}{3}\\text{ см}^3$", "$V=16\\sqrt{2}\\pi\\text{ см}^3$", "$V=\\frac{16\\pi}{3}\\text{ см}^3$"], a: 0 },
+          { q: "Қабырғалары 13 см, 14 см және 15 см болатын үшбұрыштың 14 см қабырғасына сырттай жанасатын шеңбер радиусын табыңыз:", o: ["12 см", "10 см", "14 см", "20 см"], a: 0 },
+          { q: "$f(x)=3\\cos(x-\\frac{\\pi}{3})$ функциясының $x_0=0$ нүктесіндегі туындысының мәнін $f'(0)$ табыңыз:", o: ["1,5", "$3\\sqrt{3}$", "$1,5\\sqrt{3}$", "$-1,5\\sqrt{3}$"], a: 2 },
+          { q: "$x^3+6x^2+12x+9$ көпмүшелігін комплекс сандар жиынында жіктеңіз:", o: ["$(x+3)(x+\\frac{3-i\\sqrt{3}}{2})(x+\\frac{3+i\\sqrt{3}}{2})$", "$(x-3)(x+\\frac{3-i\\sqrt{3}}{2})(x+\\frac{3+i\\sqrt{3}}{2})$", "$(x+3)(x-\\frac{3-i\\sqrt{3}}{2})(x-\\frac{3+i\\sqrt{3}}{2})$", "$(x+3)(x^2+3x+3)$"], a: 0 },
+          { q: "Тіктөртбұрыштың кіші қабырғасы $4\\sqrt{3}$ см. Ол диагональмен $60^\\circ$ бұрыш жасайды. Тіктөртбұрыштың ауданын тап:", o: ["$48\\sqrt{3}\\text{ см}^2$", "$54\\sqrt{3}\\text{ см}^2$", "$36\\sqrt{5}\\text{ см}^2$", "$36\\sqrt{3}\\text{ см}^2$"], a: 0 },
+          { q: "$\\begin{cases}y\\ge 0 \\\\ y\\ge x \\\\ y\\le -x+2\\end{cases}$ теңсіздіктер жүйесімен шектелген фигураның ауданын табыңыз:", o: ["$1\\text{ см}^2$", "$2\\text{ см}^2$", "$5\\text{ см}^2$", "$6\\text{ см}^2$"], a: 0 },
+          { q: "$\\sin\\frac{x}{2}=1-\\cos x$ теңдеуін шешіңіз:", o: ["$x=\\pi k; x=(-1)^n\\frac{\\pi}{6}+\\pi n$", "$x=2\\pi k; x=(-1)^n\\frac{\\pi}{3}+2\\pi n$", "$x=2\\pi k; x=\\pm\\frac{\\pi}{3}+2\\pi n$", "$x=\\pi k; x=\\frac{\\pi}{3}+2\\pi n$"], a: 1 },
+          { q: "$y=\\log_2(x^2-3|x|)$ функциясының анықталу облысын табыңыз:", o: ["$(-3;3)$", "$(-\\infty;-3)\\cup(3;+\\infty)$", "$[3;+\\infty)$", "$(-\\infty;0)\\cup(3;+\\infty)$"], a: 1 },
+          { q: "$\\tan\\left(2\\arccos\\frac{1}{\\sqrt{26}}-\\arcsin\\frac{5}{13}\\right)$", o: ["$-118/119$", "$120/119$", "$117/119$", "$-120/119$"], a: 3 },
+          { ctx: "Су жүретін арық: көлденең қимасы $y=ax^2+bx+c$ параболасы, $A(0;0), B(-1;0), C(-0,5;-3)$ арқылы өтеді.", q: "$a, b, c$ коэффициенттерін анықтаңыз:", o: ["$a=-12, b=2, c=0$", "$a=12, b=24, c=0$", "$a=12, b=-12, c=0$", "$a=12, b=12, c=0$"], a: 3 },
+          { ctx: "Су жүретін арық: $g(x)=12x^2+12x$", q: "$g(x)$ функциясы $f(x)$-тің туындысы болса, $A(1;15)$ арқылы өтетін алғашқы функциясын табыңыз:", o: ["$f(x)=4x^3+6x^2+12$", "$f(x)=4x^3+6x^2+5$", "$f(x)=4x^3+12x^2+5$", "$f(x)=12x^3+6x^2+5$"], a: 1 },
+          { ctx: "Су жүретін арық: $A(0;0), B(-1;0), C(-0,5;-3)$", q: "Арықтың тереңдігін есептеңіз:", o: ["12 бірлік", "9 бірлік", "3 бірлік", "6 бірлік"], a: 2 },
+          { ctx: "Су жүретін арық: $y=12x^2+12x$", q: "Параболаны $\\vec{a}(3;0)$ векторына параллель көшіру арқылы алынған функция:", o: ["$y=2x^2-60x+72$", "$y=12x^2-6x+72$", "$y=12x^2-60x+36$", "$y=12x^2-60x+72$"], a: 3 },
+          { ctx: "Су жүретін арық", q: "15 минутта арықпен $2025\\text{ м}^3$ су өтеді, 1 минутта қанша $\\text{м}^3$ су өтеді?", o: ["$225\\text{ м}^3$", "$135\\text{ м}^3$", "$270\\text{ м}^3$", "$420\\text{ м}^3$"], a: 1 },
+          { ctx: "Функция $f(x)=\\frac{3x-1}{x^2+1}$", q: "Функцияның анықталу облысын табыңыз:", o: ["$(-\\infty;0)\\cup(0;+\\infty)$", "$(-1;1)$", "$[0;+\\infty)$", "$(-\\infty;+\\infty)$"], a: 3 },
+          { ctx: "Функция $f(x)=\\frac{3x-1}{x^2+1}$", q: "Функция графигінің горизонталь асимптотасын көрсетіңіз:", o: ["$y=0$", "$y=1$", "$y=-1$", "$y=3$"], a: 0 },
+          { ctx: "Функция $f(x)=\\frac{3x-1}{x^2+1}$", q: "Функцияның мәндер жиынын табыңыз:", o: ["$[\\frac{-1-\\sqrt{10}}{2};\\frac{-1+\\sqrt{10}}{2}]$", "$[0;\\frac{-1+\\sqrt{10}}{2}]$", "$[-1;1]$", "$[-2;2]$"], a: 0 },
+          { ctx: "Функция $f(x)=\\frac{3x-1}{x^2+1}$", q: "Функцияның туындысын табыңыз:", o: ["$\\frac{3x^2+2x-3}{(x^2+1)^2}$", "$\\frac{-3x^2+2x+3}{(x^2+1)^2}$", "$\\frac{3x^2-2x-3}{(x^2+1)^2}$", "$\\frac{3x^2+2x+3}{(x^2+1)^2}$"], a: 1 },
+          { ctx: "Функция $f(x)=\\frac{3x-1}{x^2+1}$", q: "Функцияның анықталмаған интегралын табыңыз:", o: ["$1,5\\ln(x^2+1)-\\arctan x+C$", "$1,5\\ln(x^2+1)+\\arctan x+C$", "$3\\ln(x^2+1)-\\arctan x+C$", "$1,5\\ln(x^2+1)-3\\arctan x+C$"], a: 0 }
+        ]
+      },
+      {
+        id: 12,
+        title: "12-нұсқа (16.07.26 — Айдын, Түймедақ)",
+        shortTitle: "12-нұсқа (16.07)",
+        questions: [
+          { q: "$y=\\frac{2026}{\\sqrt[2026]{2\\sin 3x-1}}-\\frac{\\sqrt[2026]{\\tan x-\\sqrt{3}}}{\\sqrt{\\sin^2 x+1}}$ анықталу облысын тап:", o: ["$(\\frac{25\\pi}{18}+2\\pi n;\\frac{3\\pi}{2}+2\\pi n), n\\in\\mathbb{Z}$", "$[\\frac{25\\pi}{18}+2\\pi n;\\frac{3\\pi}{2}+2\\pi n), n\\in\\mathbb{Z}$", "$(\\frac{13\\pi}{18}+2\\pi n;\\frac{5\\pi}{6}+2\\pi n), n\\in\\mathbb{Z}$", "$(\\frac{25\\pi}{18}+\\frac{2\\pi n}{3};\\frac{3\\pi}{2}+\\frac{2\\pi n}{3}), n\\in\\mathbb{Z}$"], a: 0 },
+          { q: "$z$ комплекс сандар жиыны $3\\le|z|\\le 4$ теңсіздігімен анықталады, сол нүктелерден құралған фигура ауданы:", o: ["$4\\pi$ кв. бірлік", "$\\pi$ кв. бірлік", "$3\\pi$ кв. бірлік", "$7\\pi$ кв. бірлік"], a: 3 },
+          { q: "$ABCDA_1B_1C_1D_1$ тікбұрышты параллелепипед табанының диагональдары $K$ нүктесінде қиылысады. $\\angle AKB=60^\\circ, B_1K=2$ см, $\\angle BKB_1=15^\\circ$. Бүйір бетінің ауданын табыңыз:", o: ["$2(1+\\sqrt{3})\\text{ см}^2$", "$4(1+\\sqrt{3})\\text{ см}^2$", "$3\\sqrt{3}\\text{ см}^2$", "$2(1+\\sqrt{2})\\text{ см}^2$"], a: 1 },
+          { q: "$ABCDA_1B_1C_1D_1$ бірлік куб. $BB_1$ түзуі мен $A_1C$ түзуі арасындағы бұрыштың мәнін табыңыз:", o: ["$\\arcsin(1/2)$", "$\\arccos(1/\\sqrt{3})$", "$\\arcsin(1/\\sqrt{3})$", "$\\operatorname{arctg}(1/\\sqrt{2})$"], a: 2 },
+          { q: "$\\log_7 x - 5 \\le 2\\log_{\\sqrt{x}}(\\frac{1}{7})$ теңсіздігін шешіңіз:", o: ["$(0;1)\\cup[7;2401]$", "$[1;2401]$", "$(0;1)\\cup(7;2401)$", "$(-\\infty;1)\\cup[7;2401]$"], a: 0 },
+          { q: "$\\alpha$ жазықтығы $ABCD$ квадратының $AD$ қабырғасы арқылы өтеді. $BD$ диагоналі $\\alpha$ жазықтығымен $45^\\circ$ бұрыш жасайды. $\\alpha$ мен $ABC$ жазықтықтары арасындағы бұрыш:", o: ["$45^\\circ$", "$90^\\circ$", "$60^\\circ$", "$30^\\circ$"], a: 1 },
+          { q: "$y=-x^2\\cdot\\sqrt{x^2+1}$ функциясының экстремум нүктесін табыңыз:", o: ["$x_{\\max}=0$", "$x_{\\min}=-1$", "$x_{\\min}=1$", "экстремум нүктесі жоқ"], a: 0 },
+          { q: "$x^2-6x+7=0$ теңдеуінің түбірлері $x_1, x_2$ болса, $x_1^2+x_2^2$ өрнегінің мәнін табыңыз:", o: ["18", "20", "22", "24"], a: 2 },
+          { q: "Радиусы $R$-ға тең шар берілген. Радиус ұшы арқылы өтетін және онымен $\\alpha$ бұрыш жасайтын жазықтықтың қимасының ауданын табыңыз:", o: ["$\\pi R^2\\sin\\alpha$", "$\\pi R^2\\cos^2\\alpha$", "$\\pi R^2\\operatorname{tg}^2\\alpha$", "$2R\\sin\\alpha$"], a: 1 },
+          { q: "$2x^4-x^3-9x^2+13x-5=0$ көпмүшелігінің нақты түбірлерінің қосындысын табыңыз:", o: ["0,5", "-0,25", "1", "0,25"], a: 0 },
+          { q: "Бір кеште адамдар жиналып, әрқайсысы бір-бірімен бір реттен қол алысып амандасты. Барлығы 105 рет қол алысу болса, кеште неше адам бар?", o: ["16", "14", "15", "12"], a: 2 },
+          { q: "Шекті есептеңіз: $\\lim_{n\\to\\infty}\\frac{(3n^2+3n+1)(n+2)}{5n^3+4n^2+1}$", o: ["$3/5$", "$5/3$", "$2/5$", "$1$"], a: 0 },
+          { q: "$K(3;-2;1)$ нүктесі арқылы өтетін және $\\vec{OK}$ векторына перпендикуляр жазықтықтың теңдеуін жазыңыз:", o: ["$3x+2y+z-14=0$", "$3x-2y+z-14=0$", "$3x-2y-z+14=0$", "$x-2y+3z-14=0$"], a: 1 },
+          { q: "Өрнекті ықшамдаңыз: $\\frac{x+2}{(x-1)^2}:\\frac{x^2-4}{3(x-1)}+\\frac{3}{2-x}$", o: ["$\\frac{3}{x-1}$", "$-\\frac{3}{x-2}$", "$-\\frac{3}{x-1}$", "$\\frac{1}{x-1}$"], a: 2 },
+          { q: "$\\begin{cases}x=1+2t \\\\ y=1-2t \\\\ z=-1+2t\\end{cases}$ және $\\frac{x}{3}=\\frac{y-1}{-2}=\\frac{z+2}{3}$ түзулерінің өзара орналасуын анықтаңыз:", o: ["параллель", "айқас", "беттеседі", "қиылысады"], a: 3 },
+          { q: "Қайық ағысқа қарсы 10 км жүрді, қайтарда 9 км жүрді. Ағыс жылдамдығы 4 км/сағ. Барлық жолға 1 сағ кетті. Қайықтың меншікті жылдамдығы:", o: ["14 км/сағ", "20 км/сағ", "12 км/сағ", "8 км/сағ"], a: 1 },
+          { q: "$\\cot(\\frac{3\\pi}{2}+\\alpha)\\cot(\\pi-\\alpha)-\\cot(\\frac{\\pi}{2}+\\alpha)\\tan(\\alpha-2\\pi)$ өрнегін ықшамдаңыз:", o: ["$\\frac{1}{\\cos^2\\alpha}$", "$\\operatorname{ctg}^2\\alpha$", "$1$", "$\\frac{1}{\\sin^2\\alpha}$"], a: 0 },
+          { q: "Теңбүйірлі үшбұрыштың табаны бүйір қабырғасынан 6 см-ге кіші. Периметрі 31,2 см. Бүйір қабырғаларының ұзындықтарының қосындысы:", o: ["22,5 см", "26,3 см", "20,1 см", "24,8 см"], a: 3 },
+          { q: "Арифметикалық прогрессияның 23, 24, 27 және 30-мүшелерінің қосындысы 188-ге тең болса, алғашқы 51 мүшесінің қосындысын табыңыз:", o: ["2397", "2500", "2305", "2450"], a: 0 },
+          { q: "Тең қабырғалы үшбұрыштың қабырғасы $\\sqrt{3}$. Ауданын табыңыз:", o: ["$\\sqrt{3}/4$", "$3\\sqrt{3}/4$", "$3/4$", "$\\sqrt{3}/2$"], a: 1 },
+          { q: "Теңсіздікті шешіңіз: $\\sqrt{x^2-5x+6}\\cdot(x+9)\\ge 0$", o: ["$[-9;2]$", "$[3;+\\infty)$", "$[-9;2]\\cup[3;+\\infty)$", "$[-9;+\\infty)$"], a: 2 },
+          { q: "$(a^3+ab)^{21}$ биномдық жіктелуінің ортаңғы мүшелері:", o: ["$352716a^{43}b^{11}$ және $352716a^{41}b^{10}$", "$352716a^{43}b^{10}$ және $352716a^{41}b^{11}$", "$352716a^{40}b^{11}$ және $352716a^{42}b^{10}$", "$184756a^{43}b^{10}$ және $184756a^{41}b^{11}$"], a: 1 },
+          { q: "Тікбұрышты $MKN$ үшбұрышында ($\\angle K=90^\\circ$) $KD$ — медиана. Гипотенуза $MN=20$. $|\\vec{MN}-\\vec{MK}+\\vec{ND}|=?$", o: ["5", "10", "15", "20"], a: 1 },
+          { q: "$\\vec{a}\\{4;3\\}$ және $\\vec{b}\\{2;x\\}$ векторларының скаляр көбейтіндісі $\\vec{a}\\cdot\\vec{b}=20$. $x$ айнымалысының мәні:", o: ["2", "3", "4", "5"], a: 2 },
+          { q: "$2^{12x-1}-4^{6x-1}+16^{3x-1}=1280$", o: ["$x=3$", "$x=2$", "$x=0$", "$x=1$"], a: 3 },
+          { q: "$y=3\\sqrt{x}\\operatorname{arctg}x+1$ функциясының туындысын тап:", o: ["$y'=\\frac{3\\operatorname{arctg}x}{2\\sqrt{x}}+\\frac{3\\sqrt{x}}{1+x^2}$", "$y'=\\frac{3\\operatorname{arctg}x}{\\sqrt{x}}+\\frac{3\\sqrt{x}}{1+x^2}$", "$y'=\\frac{3}{2\\sqrt{x}(1+x^2)}$", "$y'=\\frac{3\\operatorname{arctg}x}{2\\sqrt{x}}-\\frac{3\\sqrt{x}}{1+x^2}$"], a: 0 },
+          { q: "$f(x)=\\sqrt[5]{(x^2-7x)^3}$ туындысын тап:", o: ["$f'(x)=\\frac{2x-7}{5\\sqrt[5]{(x^2-7x)^2}}$", "$f'(x)=\\frac{3(2x-7)}{5\\sqrt[5]{(x^2-7x)^2}}$", "$f'(x)=\\frac{3(2x-7)}{\\sqrt[5]{(x^2-7x)^2}}$", "$f'(x)=\\frac{3}{5\\sqrt[5]{(x^2-7x)^2}}$"], a: 1 },
+          { q: "$y=\\frac{9}{x^2}, y=-x, x=-2$ сызықтарымен шектелген фигураның ауданы:", o: ["1", "2", "1,5", "2,5"], a: 0 },
+          { q: "$\\sqrt{2x+3}\\le x+2$", o: ["$[-1;2]$", "$[-1,5;1]$", "$[-1,5;+\\infty)$", "$(-2;+\\infty)$"], a: 2 },
+          { q: "$\\begin{cases}2x-3y+1=0 \\\\ x-2y+4z=0\\end{cases}$ түзуінің канондық теңдеуін жазыңыз:", o: ["$\\frac{x+2}{8}=\\frac{y+1}{6}=z$", "$\\frac{x+2}{4}=\\frac{y+1}{2}=z$", "$\\frac{x+2}{12}=\\frac{y+1}{8}=z$", "$\\frac{x+2}{4}=\\frac{y+1}{6}=z$"], a: 2 },
+          { q: "$(1-6x+8x^2)\\cdot\\sqrt{15x-2-25x^2}\\ge 0$", o: ["$[0,2;0,25]\\cup\\{0,4\\}$", "$[0,25;+\\infty)$", "$[0,2;0,25]$", "$[0,25;0,4]$"], a: 0 },
+          { q: "$\\frac{1}{x+3}+\\frac{1}{x+4}=\\frac{1}{x+5}+\\frac{1}{x+2}$ теңдеуінің түбірлері жататын аралық:", o: ["$(-5;-2)$", "$(-3;5)$", "$(-4;-3)$", "$(-3;-2)$"], a: 0 },
+          { q: "Теңбүйірлі тікбұрышты үшбұрыштың гипотенузасы 52 см-ге тең. Үшбұрыштың ауданын табыңыз:", o: ["$600,25\\text{ см}^2$", "$720,00\\text{ см}^2$", "$500,50\\text{ см}^2$", "$676,48\\text{ см}^2$"], a: 3 },
+          { q: "Шеңберге іштей сызылған бұрыштың мәнін табыңыз, егер оған тірелетін центрлік бұрыш $120^\\circ$-қа тең болса:", o: ["$60^\\circ$", "$30^\\circ$", "$45^\\circ$", "$90^\\circ$"], a: 0 },
+          { q: "Цилиндрдің толық бетінің ауданы $S=216\\pi$, биіктігі мен радиусының қатынасы 2:1. Биіктігін ($h$) табыңыз:", o: ["12", "10", "14", "8"], a: 0 },
+          { q: "$\\begin{cases}5x^2+2x-7\\ge 0 \\\\ |x|\\le 2\\end{cases}$", o: ["$[-2;1]\\cup[1,4;2]$", "$[-2;-1,4]\\cup[1;2]$", "$[-2;-1]\\cup[1,4;2]$", "$[-1,4;1]$"], a: 1 },
+          { q: "$\\frac{(2y-1)\\cdot((2y+1)^2-8y)^{-\\frac{1}{2}}}{25y^2-3}$ өрнегінің $y=\\frac{\\sqrt{2}}{5}$ болғандағы мәні:", o: ["1", "-1", "5", "-5"], a: 0 },
+          { q: "Цилиндрдің биіктігі мен радиусының қатынасы 2:1, толық бетінің ауданы $216\\pi$. Биіктігін тап:", o: ["12", "30", "45", "38"], a: 0 },
+          { q: "$y=\\sin 3x\\cos x-\\cos 3x\\sin x+\\cos\\frac{1}{2}x$ функциясының ең кіші оң периоды:", o: ["$4\\pi$", "$3\\pi$", "$7\\pi$", "$\\pi$"], a: 0 },
+          { q: "$\\frac{\\log_2\\log_5\\sqrt[8]{5}}{\\log_4\\log_3\\sqrt{81}}$", o: ["6", "-6", "3", "4"], a: 1 },
+          { q: "$2\\cdot 81^{\\sqrt{x^2+1}-1}+3\\cdot 9^{\\sqrt{x^2+1}-1}-5=0$", o: ["0,5", "-0,5", "0", "Түбірлері жоқ"], a: 2 },
+          { ctx: "Айдын контекст: $A(2;0), B(2;2), C(8;4)$", q: "$\\vec{CB}, \\vec{CD}$ векторларының координатасын табыңыз:", o: ["$CB(-6;-1), CD(1;-4)$", "$CB(-6;-2), CD(0;-2)$", "$CB(-6;-2), CD(0;-4)$", "$CB(-6;0), CD(0;-4)$"], a: 2 },
+          { ctx: "Айдын контекст: $A(2;0), B(2;2), C(8;4)$", q: "Егер $D$ төбесі тік бұрышты трапеция болса, $D$ нүктесінің координатасы?", o: ["$D(4;0)$", "$D(8;0)$", "$D(6;2)$", "$D(2;4)$"], a: 1 },
+          { ctx: "Айдын контекст: $A(2;0), B(2;2), C(8;4)$", q: "$\\vec{CB}$ мен $\\vec{CD}$ арасындағы бұрыштың косинусын тап:", o: ["$\\sqrt{10}/10$", "$3/\\sqrt{15}$", "$4/\\sqrt{20}$", "$10/\\sqrt{10}$"], a: 0 },
+          { ctx: "Айдын контекст: $A(2;0), B(2;2), C(8;4)$", q: "$BC$ түзуінің теңдеуі?", o: ["$y=(3/4)x+1$", "$y=(1/3)x+4/3$", "$y=(2/3)x+2$", "$y=(1/2)x+1$"], a: 1 },
+          { ctx: "Айдын контекст: $A(2;0), B(2;2), C(8;4)$", q: "Шыққан функцияны $Ox$ осімен айналдырғандағы дененің көлемін тап:", o: ["$V=56\\pi$", "$V=30\\pi$", "$V=25\\pi$", "$V=45\\pi$"], a: 0 },
+          { ctx: "Түймедақ контекст: $10\\times 10$ парақты мата, 1 құты құны 250 тг (300 м²).", q: "Квадраттағы ауданы $S_1$?", o: ["100", "150", "50", "80"], a: 0 },
+          { ctx: "Түймедақ контекст: $10\\times 10$ парақты мата.", q: "$S_2$ ауданы?", o: ["$100-50\\pi$", "$100-25\\pi$", "$25\\pi$", "$100\\pi$"], a: 1 },
+          { ctx: "Түймедақ контекст: $10\\times 10$ парақты мата.", q: "$S$ ауданы?", o: ["$100\\text{ м}^2$", "$150\\text{ м}^2$", "$50\\text{ м}^2$", "$80\\text{ м}^2$"], a: 2 },
+          { ctx: "Түймедақ контекст: 1 құты 250 тг (300 м²).", q: "8 жапырақ болған кезде қанша құты кетеді?", o: ["2", "3", "4", "1"], a: 0 },
+          { ctx: "Түймедақ контекст: 1 құты 250 тг (300 м²).", q: "8-ден 15 жапырақ жасайтын болса қанша ақша кетеді?", o: ["4000 тг", "3000 тг", "5000 тг", "2500 тг"], a: 2 }
+        ]
+      }
+    ];
+
+    /* =======================================================================
+       2. WEB AUDIO API SOUND EFFECTS (NO EXTERNAL AUDIO FILES)
+       ======================================================================= */
+    const SoundFX = (() => {
+      let ctx = null;
+      function getCtx() {
+        if (!ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) ctx = new AudioCtx();
+        }
+        if (ctx && ctx.state === 'suspended') ctx.resume();
+        return ctx;
+      }
+
+      function playTone(freq, duration, type = 'sine', volume = 0.14, delay = 0) {
+        if (!state.soundOn) return;
+        try {
+          const c = getCtx();
+          if (!c) return;
+          const osc = c.createOscillator();
+          const gain = c.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, c.currentTime + delay);
+          gain.gain.setValueAtTime(volume, c.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + duration);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start(c.currentTime + delay);
+          osc.stop(c.currentTime + delay + duration);
+        } catch (e) { /* Ignore audio errors if blocked */ }
+      }
+
+      return {
+        correct(streak) {
+          const boost = Math.min(streak, 6) * 35;
+          playTone(523.25 + boost, 0.14, 'triangle', 0.16, 0);
+          playTone(659.25 + boost, 0.16, 'triangle', 0.16, 0.08);
+          playTone(783.99 + boost, 0.24, 'sine', 0.18, 0.16);
+        },
+        wrong() {
+          playTone(220, 0.18, 'sawtooth', 0.1, 0);
+          playTone(175, 0.28, 'sawtooth', 0.1, 0.12);
+        },
+        click() {
+          playTone(440, 0.06, 'sine', 0.07, 0);
+        },
+        finish() {
+          [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+            playTone(f, 0.25, 'triangle', 0.16, idx * 0.1);
+          });
+        }
+      };
+    })();
+
+    /* =======================================================================
+       3. APPLICATION STATE
+       ======================================================================= */
+    const LETTERS = ['A', 'B', 'C', 'D'];
+    const QUESTION_TIME = 60; // seconds per question in Game mode
+
+    const state = {
+      mode: 'game',          // 'game' | 'study'
+      shuffle: false,
+      soundOn: true,
+      variantIndex: 0,
+      isWrongOnlySession: false,
+      questions: [],         // active array of question objects
+      currentIndex: 0,
+      answers: [],           // array of selected option indices (null if unanswered, -1 if timeout)
+      score: 0,
+      streak: 0,
+      bestStreak: 0,
+      timeLeft: QUESTION_TIME,
+      timerInterval: null,
+      quizStartTime: 0,
+      totalElapsedSec: 0
+    };
+
+    /* =======================================================================
+       4. KATEX RENDER HELPER
+       ======================================================================= */
+    function renderMath(el) {
+      if (!el || typeof renderMathInElement !== 'function') return;
+      try {
+        renderMathInElement(el, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      } catch (err) {
+        console.warn('KaTeX render warning:', err);
+      }
+    }
+
+    /* =======================================================================
+       5. HOME SCREEN CONTROLS
+       ======================================================================= */
+    function setMode(newMode) {
+      SoundFX.click();
+      state.mode = newMode;
+      const btnGame = document.getElementById('btn-mode-game');
+      const btnStudy = document.getElementById('btn-mode-study');
+      const desc = document.getElementById('mode-description');
+
+      if (newMode === 'game') {
+        btnGame.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-sm sm:text-base font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-lg';
+        btnStudy.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-sm sm:text-base font-bold transition-all flex items-center justify-center gap-2 text-purple-300 hover:text-white';
+        desc.innerHTML = '🔥 <strong>Ойын режимі:</strong> Әр сұраққа 60 секунд таймер, жылдамдық бонусы (+1000 базалық ұпай) және қатарынан дұрыс жауаптар сериясы (streak).';
+      } else {
+        btnStudy.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-sm sm:text-base font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg';
+        btnGame.className = 'flex-1 py-3 px-3 sm:px-4 rounded-xl text-sm sm:text-base font-bold transition-all flex items-center justify-center gap-2 text-purple-300 hover:text-white';
+        desc.innerHTML = '🧠 <strong>Жаттау режимі:</strong> Таймер жоқ, дұрыс/қате жауап бірден көрсетіледі, навигатор арқылы кез келген сұраққа еркін өтуге болады.';
+      }
+    }
+
+    function toggleShuffle() {
+      SoundFX.click();
+      state.shuffle = !state.shuffle;
+      const dot = document.getElementById('shuffle-dot');
+      const btn = document.getElementById('btn-toggle-shuffle');
+      if (state.shuffle) {
+        dot.className = 'w-3 h-3 rounded-full bg-fuchsia-400 shadow-[0_0_8px_#e879f9]';
+        btn.classList.add('border-fuchsia-400/60', 'bg-fuchsia-500/15', 'text-fuchsia-100');
+      } else {
+        dot.className = 'w-3 h-3 rounded-full bg-slate-500';
+        btn.classList.remove('border-fuchsia-400/60', 'bg-fuchsia-500/15', 'text-fuchsia-100');
+      }
+    }
+
+    function toggleSound() {
+      state.soundOn = !state.soundOn;
+      if (state.soundOn) SoundFX.click();
+      const iconHome = document.getElementById('sound-icon-home');
+      const labelHome = document.getElementById('sound-label-home');
+      const btnHome = document.getElementById('btn-toggle-sound-home');
+      const btnQuiz = document.getElementById('btn-toggle-sound-quiz');
+
+      if (state.soundOn) {
+        iconHome.textContent = '🔊';
+        labelHome.textContent = 'Дыбыс: Қосулы';
+        btnHome.className = 'px-4 py-2.5 rounded-xl border border-emerald-400/40 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 text-sm font-semibold flex items-center gap-2 transition';
+        btnQuiz.textContent = '🔊';
+      } else {
+        iconHome.textContent = '🔇';
+        labelHome.textContent = 'Дыбыс: Өшірулі';
+        btnHome.className = 'px-4 py-2.5 rounded-xl border border-purple-500/30 bg-[#1a0b2e] hover:bg-purple-900/50 text-purple-300 text-sm font-semibold flex items-center gap-2 transition';
+        btnQuiz.textContent = '🔇';
+      }
+    }
+
+    function showScreen(screenId) {
+      ['screen-home', 'screen-quiz', 'screen-results'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', id !== screenId);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* =======================================================================
+       6. QUIZ LIFECYCLE
+       ======================================================================= */
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function startQuiz(variantIdx, customQuestions = null) {
+      SoundFX.click();
+      clearTimer();
+      state.variantIndex = variantIdx;
+      state.isWrongOnlySession = Boolean(customQuestions);
+
+      const variant = VARIANTS[variantIdx];
+      const baseList = customQuestions
+        ? customQuestions
+        : variant.questions.map((q, i) => ({ ...q, origNum: i + 1 }));
+
+      state.questions = state.shuffle && !customQuestions ? shuffleArray(baseList) : baseList;
+      state.currentIndex = 0;
+      state.answers = new Array(state.questions.length).fill(null);
+      state.score = 0;
+      state.streak = 0;
+      state.bestStreak = 0;
+      state.quizStartTime = Date.now();
+
+      // Configure HUD visibility based on mode
+      document.getElementById('hud-variant-name').textContent = state.isWrongOnlySession
+        ? `${variant.shortTitle} • Қатемен жұмыс`
+        : variant.shortTitle;
+
+      document.getElementById('hud-timer-box').classList.toggle('hidden', state.mode !== 'game');
+      document.getElementById('hud-score-box').classList.toggle('hidden', state.mode !== 'game');
+      document.getElementById('btn-prev').classList.toggle('hidden', state.mode === 'game');
+
+      showScreen('screen-quiz');
+      renderQuestion();
+    }
+
+    function restartCurrentVariant() {
+      startQuiz(state.variantIndex);
+    }
+
+    function startWrongOnlyQuiz() {
+      const wrongQs = state.questions.filter((q, idx) => state.answers[idx] !== q.a);
+      if (wrongQs.length === 0) return;
+      startQuiz(state.variantIndex, wrongQs);
+    }
+
+    function goHome() {
+      clearTimer();
+      SoundFX.click();
+      showScreen('screen-home');
+    }
+
+    /* =======================================================================
+       7. RENDER CURRENT QUESTION & OPTIONS
+       ======================================================================= */
+    function renderQuestion() {
+      clearTimer();
+      const qObj = state.questions[state.currentIndex];
+      const total = state.questions.length;
+      const userAns = state.answers[state.currentIndex];
+      const isAnswered = userAns !== null;
+
+      // Update HUD
+      document.getElementById('hud-counter').textContent = `${state.currentIndex + 1} / ${total}`;
+      document.getElementById('hud-score').textContent = state.score.toLocaleString('ru-RU');
+      document.getElementById('hud-progress-bar').style.width = `${((state.currentIndex + (isAnswered ? 1 : 0)) / total) * 100}%`;
+
+      const streakBox = document.getElementById('hud-streak-box');
+      if (state.mode === 'game' && state.streak >= 2) {
+        streakBox.classList.remove('hidden');
+        streakBox.classList.add('flex', 'streak-glow');
+        document.getElementById('hud-streak').textContent = state.streak;
+      } else {
+        streakBox.classList.add('hidden');
+        streakBox.classList.remove('flex', 'streak-glow');
+      }
+
+      // Context box
+      const ctxBox = document.getElementById('question-context-box');
+      const ctxText = document.getElementById('question-context-text');
+      if (qObj.ctx) {
+        ctxBox.classList.remove('hidden');
+        ctxText.textContent = qObj.ctx;
+        renderMath(ctxText);
+      } else {
+        ctxBox.classList.add('hidden');
+      }
+
+      // Question text
+      const qEl = document.getElementById('question-text');
+      qEl.textContent = `${qObj.origNum ? qObj.origNum + '. ' : ''}${qObj.q}`;
+      renderMath(qEl);
+
+      // Options Grid
+      const grid = document.getElementById('options-grid');
+      grid.innerHTML = '';
+
+      qObj.o.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.index = idx;
+
+        let classes = `quiz-tile tile-${idx} w-full text-left p-4 sm:p-5 rounded-2xl text-white font-bold text-base sm:text-lg flex items-center gap-3.5 min-h-[76px] sm:min-h-[88px]`;
+
+        if (isAnswered) {
+          btn.disabled = true;
+          if (idx === qObj.a) {
+            classes += ' tile-correct';
+          } else if (idx === userAns) {
+            classes += ' tile-wrong';
+          } else {
+            classes += ' tile-dimmed';
+          }
+        }
+
+        btn.className = classes;
+        btn.onclick = () => selectAnswer(idx);
+
+        const badge = document.createElement('span');
+        badge.className = 'shrink-0 w-9 h-9 rounded-xl bg-black/25 flex items-center justify-center font-black text-sm sm:text-base border border-white/20';
+        badge.textContent = LETTERS[idx];
+
+        const label = document.createElement('span');
+        label.className = 'flex-1 leading-snug break-words';
+        label.textContent = optText;
+
+        const statusIcon = document.createElement('span');
+        statusIcon.className = 'shrink-0 text-xl font-black';
+        if (isAnswered) {
+          if (idx === qObj.a) statusIcon.textContent = '✓';
+          else if (idx === userAns) statusIcon.textContent = '✕';
+        }
+
+        btn.appendChild(badge);
+        btn.appendChild(label);
+        btn.appendChild(statusIcon);
+        grid.appendChild(btn);
+      });
+
+      // Render KaTeX inside all newly created option tiles
+      renderMath(grid);
+
+      // Update Bottom Bar
+      const fb = document.getElementById('feedback-message');
+      const btnNext = document.getElementById('btn-next');
+      const btnPrev = document.getElementById('btn-prev');
+
+      btnNext.textContent = state.currentIndex === total - 1 ? 'Нәтижені көру 🏁' : 'Келесі →';
+      if (state.mode === 'study') {
+        btnPrev.disabled = state.currentIndex === 0;
+        btnPrev.classList.toggle('opacity-40', state.currentIndex === 0);
+        btnNext.disabled = false;
+      } else {
+        btnNext.disabled = !isAnswered;
+      }
+
+      if (!isAnswered) {
+        fb.className = 'text-sm sm:text-base font-bold text-purple-200 flex items-center gap-2';
+        fb.textContent = 'Жауап нұсқасын таңдаңыз (A–D немесе 1–4)';
+        if (state.mode === 'game') startQuestionTimer();
+      } else if (userAns === qObj.a) {
+        fb.className = 'text-sm sm:text-base font-extrabold text-emerald-300 flex items-center gap-2';
+        fb.textContent = '✅ Дұрыс жауап!';
+      } else if (userAns === -1) {
+        fb.className = 'text-sm sm:text-base font-extrabold text-amber-300 flex items-center gap-2';
+        fb.textContent = `⏰ Уақыт аяқталды! Дұрыс жауап: ${LETTERS[qObj.a]}`;
+      } else {
+        fb.className = 'text-sm sm:text-base font-extrabold text-rose-300 flex items-center gap-2';
+        fb.textContent = `❌ Қате! Дұрыс жауап: ${LETTERS[qObj.a]}`;
+      }
+    }
+
+    /* =======================================================================
+       8. TIMER & ANSWER SELECTION
+       ======================================================================= */
+    function clearTimer() {
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+    }
+
+    function startQuestionTimer() {
+      state.timeLeft = QUESTION_TIME;
+      updateTimerDisplay();
+      state.timerInterval = setInterval(() => {
+        state.timeLeft--;
+        updateTimerDisplay();
+        if (state.timeLeft <= 0) {
+          clearTimer();
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('hud-timer');
+      const box = document.getElementById('hud-timer-box');
+      el.textContent = state.timeLeft;
+      if (state.timeLeft <= 10) {
+        box.className = 'px-3 py-1.5 rounded-xl bg-rose-500/25 border border-rose-400 text-rose-200 font-extrabold text-sm min-w-[68px] text-center animate-pulse';
+      } else {
+        box.className = 'px-3 py-1.5 rounded-xl bg-[#1a0b2e] border border-cyan-400/40 text-cyan-300 font-extrabold text-sm min-w-[68px] text-center';
+      }
+    }
+
+    function handleTimeout() {
+      if (state.answers[state.currentIndex] !== null) return;
+      state.answers[state.currentIndex] = -1;
+      state.streak = 0;
+      SoundFX.wrong();
+      renderQuestion();
+    }
+
+    function spawnScorePopup(points) {
+      const anchor = document.getElementById('score-popup-anchor');
+      const pop = document.createElement('div');
+      pop.className = 'score-float text-emerald-300 font-black text-base whitespace-nowrap drop-shadow';
+      pop.textContent = `+${points}`;
+      anchor.appendChild(pop);
+      setTimeout(() => pop.remove(), 950);
+    }
+
+    function selectAnswer(optIdx) {
+      if (state.answers[state.currentIndex] !== null) return;
+      clearTimer();
+
+      const qObj = state.questions[state.currentIndex];
+      state.answers[state.currentIndex] = optIdx;
+      const isCorrect = optIdx === qObj.a;
+
+      if (isCorrect) {
+        state.streak++;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+
+        if (state.mode === 'game') {
+          const speedBonus = Math.round((state.timeLeft / QUESTION_TIME) * 500);
+          const streakBonus = Math.min(state.streak - 1, 5) * 100;
+          const gained = 1000 + speedBonus + streakBonus;
+          state.score += gained;
+          spawnScorePopup(gained);
+        } else {
+          state.score += 100;
+        }
+        SoundFX.correct(state.streak);
+      } else {
+        state.streak = 0;
+        SoundFX.wrong();
+      }
+
+      renderQuestion();
+    }
+
+    function nextQuestion() {
+      SoundFX.click();
+      if (state.currentIndex < state.questions.length - 1) {
+        state.currentIndex++;
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function prevQuestion() {
+      if (state.currentIndex > 0) {
+        SoundFX.click();
+        state.currentIndex--;
+        renderQuestion();
+      }
+    }
+
+    /* =======================================================================
+       9. QUESTION NAVIGATOR & EXIT MODALS
+       ======================================================================= */
+    function openNavModal() {
+      SoundFX.click();
+      const grid = document.getElementById('nav-grid');
+      grid.innerHTML = '';
+
+      state.questions.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = idx + 1;
+
+        const ans = state.answers[idx];
+        let cls = 'h-10 rounded-xl font-bold text-sm transition flex items-center justify-center ';
+
+        if (ans === null) {
+          cls += 'bg-[#1a0b2e] border border-purple-500/40 text-purple-200 hover:bg-purple-800/60';
+        } else if (ans === q.a) {
+          cls += 'bg-emerald-600 text-white';
+        } else {
+          cls += 'bg-rose-600 text-white';
+        }
+
+        if (idx === state.currentIndex) {
+          cls += ' ring-2 ring-white scale-105';
+        }
+
+        btn.className = cls;
+        btn.onclick = () => {
+          state.currentIndex = idx;
+          closeNavModal();
+          renderQuestion();
+        };
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('modal-nav').classList.remove('hidden');
+    }
+
+    function closeNavModal() {
+      document.getElementById('modal-nav').classList.add('hidden');
+    }
+
+    function finishQuizEarly() {
+      closeNavModal();
+      finishQuiz();
+    }
+
+    function openExitModal() {
+      SoundFX.click();
+      document.getElementById('modal-exit').classList.remove('hidden');
+    }
+
+    function closeExitModal() {
+      document.getElementById('modal-exit').classList.add('hidden');
+    }
+
+    function confirmExit() {
+      closeExitModal();
+      goHome();
+    }
+
+    /* =======================================================================
+       10. RESULTS SCREEN & REVIEW ACCORDION
+       ======================================================================= */
+    function formatDuration(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function finishQuiz() {
+      clearTimer();
+      SoundFX.finish();
+      state.totalElapsedSec = Math.max(1, Math.round((Date.now() - state.quizStartTime) / 1000));
+
+      const total = state.questions.length;
+      let correctCount = 0;
+      state.questions.forEach((q, idx) => {
+        if (state.answers[idx] === q.a) correctCount++;
+      });
+      const wrongCount = total - correctCount;
+      const percent = Math.round((correctCount / total) * 100);
+
+      // Hero feedback
+      const emojiEl = document.getElementById('res-emoji');
+      const titleEl = document.getElementById('res-title');
+      if (percent >= 85) {
+        emojiEl.textContent = '🏆';
+        titleEl.textContent = 'Керемет нәтиже!';
+      } else if (percent >= 60) {
+        emojiEl.textContent = '🔥';
+        titleEl.textContent = 'Жақсы нәтиже!';
+      } else {
+        emojiEl.textContent = '💪';
+        titleEl.textContent = 'Қатемен жұмыс істейік!';
+      }
+
+      document.getElementById('res-subtitle').textContent = VARIANTS[state.variantIndex].title;
+      document.getElementById('res-percent-label').textContent = `${percent}%`;
+      document.getElementById('res-accuracy-bar').style.width = `${percent}%`;
+      document.getElementById('res-correct-count').textContent = `${correctCount} / ${total}`;
+      document.getElementById('res-score').textContent = state.score.toLocaleString('ru-RU');
+      document.getElementById('res-best-streak').textContent = `🔥 ${state.bestStreak}`;
+      document.getElementById('res-time').textContent = formatDuration(state.totalElapsedSec);
+
+      const btnWrong = document.getElementById('btn-retry-wrong');
+      document.getElementById('wrong-count-badge').textContent = wrongCount;
+      if (wrongCount === 0) {
+        btnWrong.classList.add('hidden');
+      } else {
+        btnWrong.classList.remove('hidden');
+      }
+
+      renderReviewList('all');
+      showScreen('screen-results');
+    }
+
+    function renderReviewList(filter) {
+      const btnAll = document.getElementById('filter-all');
+      const btnWrong = document.getElementById('filter-wrong');
+      if (filter === 'all') {
+        btnAll.className = 'px-3 py-1.5 rounded-lg bg-purple-600 text-white';
+        btnWrong.className = 'px-3 py-1.5 rounded-lg text-purple-300 hover:text-white';
+      } else {
+        btnWrong.className = 'px-3 py-1.5 rounded-lg bg-rose-600 text-white';
+        btnAll.className = 'px-3 py-1.5 rounded-lg text-purple-300 hover:text-white';
+      }
+
+      const container = document.getElementById('review-list');
+      container.innerHTML = '';
+
+      let shown = 0;
+      state.questions.forEach((q, idx) => {
+        const userAns = state.answers[idx];
+        const isCorrect = userAns === q.a;
+        if (filter === 'wrong' && isCorrect) return;
+        shown++;
+
+        const details = document.createElement('details');
+        details.className = `rounded-2xl border p-4 transition ${
+          isCorrect
+            ? 'bg-emerald-950/30 border-emerald-500/35'
+            : 'bg-rose-950/35 border-rose-500/40'
+        }`;
+        if (!isCorrect) details.open = true;
+
+        const summary = document.createElement('summary');
+        summary.className = 'cursor-pointer list-none flex items-start justify-between gap-3 font-bold text-sm sm:text-base text-white';
+
+        const left = document.createElement('div');
+        left.className = 'flex items-start gap-2.5 flex-1';
+        const icon = document.createElement('span');
+        icon.className = isCorrect ? 'text-emerald-400 shrink-0' : 'text-rose-400 shrink-0';
+        icon.textContent = isCorrect ? '✅' : '❌';
+        const qSpan = document.createElement('span');
+        qSpan.textContent = `${q.origNum ? q.origNum + '. ' : (idx + 1) + '. '}${q.q}`;
+        left.appendChild(icon);
+        left.appendChild(qSpan);
+
+        const chevron = document.createElement('span');
+        chevron.className = 'text-purple-300 text-xs shrink-0 mt-1';
+        chevron.textContent = '▼';
+
+        summary.appendChild(left);
+        summary.appendChild(chevron);
+
+        const body = document.createElement('div');
+        body.className = 'mt-3 pt-3 border-t border-white/10 space-y-2 text-xs sm:text-sm';
+
+        if (q.ctx) {
+          const cDiv = document.createElement('div');
+          cDiv.className = 'text-cyan-200/90 bg-indigo-950/60 px-3 py-2 rounded-xl';
+          cDiv.textContent = `Контекст: ${q.ctx}`;
+          body.appendChild(cDiv);
+        }
+
+        const userRow = document.createElement('div');
+        userRow.className = isCorrect ? 'text-emerald-300 font-semibold' : 'text-rose-300 font-semibold';
+        const userText = userAns === null
+          ? 'Белгіленбеген'
+          : userAns === -1
+            ? 'Уақыт аяқталды'
+            : `${LETTERS[userAns]}) ${q.o[userAns]}`;
+        userRow.textContent = `Сіздің жауабыңыз: ${userText}`;
+        body.appendChild(userRow);
+
+        if (!isCorrect) {
+          const correctRow = document.createElement('div');
+          correctRow.className = 'text-emerald-300 font-bold';
+          correctRow.textContent = `Дұрыс жауап: ${LETTERS[q.a]}) ${q.o[q.a]}`;
+          body.appendChild(correctRow);
+        }
+
+        details.appendChild(summary);
+        details.appendChild(body);
+        container.appendChild(details);
+      });
+
+      if (shown === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center py-8 text-emerald-300 font-bold';
+        empty.textContent = '🎉 Қате жауаптар жоқ! Барлық сұраққа дұрыс жауап бердіңіз.';
+        container.appendChild(empty);
+      }
+
+      renderMath(container);
+    }
+
+    /* =======================================================================
+       11. KEYBOARD SHORTCUTS (1-4 / A-D & ENTER)
+       ======================================================================= */
+    document.addEventListener('keydown', (e) => {
+      const quizVisible = !document.getElementById('screen-quiz').classList.contains('hidden');
+      const modalOpen = !document.getElementById('modal-nav').classList.contains('hidden') ||
+                        !document.getElementById('modal-exit').classList.contains('hidden');
+      if (!quizVisible || modalOpen) return;
+
+      const key = e.key.toLowerCase();
+      const map = { '1': 0, '2': 1, '3': 2, '4': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+      if (key in map) {
+        e.preventDefault();
+        selectAnswer(map[key]);
+      } else if (e.key === 'Enter' || e.key === 'ArrowRight') {
+        const btnNext = document.getElementById('btn-next');
+        if (!btnNext.disabled) {
+          e.preventDefault();
+          nextQuestion();
+        }
+      } else if (e.key === 'ArrowLeft' && state.mode === 'study') {
+        e.preventDefault();
+        prevQuestion();
+      }
+    });
+
+    /* =======================================================================
+       12. INITIALIZE KATEX ON HOME SCREEN ONCE LOADED
+       ======================================================================= */
+    window.addEventListener('load', () => {
+      renderMath(document.getElementById('screen-home'));
+    });
+  </script>
+</body>
+</html>
